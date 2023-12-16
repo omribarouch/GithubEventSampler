@@ -1,8 +1,8 @@
 package main
 
 import (
-	"GithubEventHandler/ApiServer/database"
-	"GithubEventHandler/ApiServer/handlers"
+	"GithubEventHandler/apiServer/handlers"
+	"GithubEventHandler/database"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 )

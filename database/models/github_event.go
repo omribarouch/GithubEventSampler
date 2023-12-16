@@ -1,9 +1,7 @@
 package models
 
-import "gorm.io/gorm"
-
 type GithubEvent struct {
-	gorm.Model
+	Type string `json:"type" gorm:"text;not null;default:null"`
 }
 
 func (GithubEvent) TableName() string {

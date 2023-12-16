@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"GithubEventHandler/ApiServer/database"
-	"GithubEventHandler/models"
+	"GithubEventHandler/database"
+	"GithubEventHandler/database/models"
 	"github.com/gofiber/fiber/v2"
 )
 

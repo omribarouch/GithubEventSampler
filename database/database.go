@@ -1,7 +1,7 @@
 package database
 
 import (
-	"GithubEventHandler/models"
+	models2 "GithubEventHandler/database/models"
 	"fmt"
 	"log"
 	"os"
@@ -40,9 +40,9 @@ func ConnectDB() {
 
 	log.Println("running migrations")
 	err = db.AutoMigrate(
-		&models.GithubEvent{},
-		&models.GithubActor{},
-		&models.GithubRepository{},
+		&models2.GithubEvent{},
+		&models2.GithubActor{},
+		&models2.GithubRepository{},
 	)
 	if err != nil {
 		fmt.Println("Failed to perform database auto migration:", err)

@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"context"
@@ -6,25 +6,7 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
-func main() {
-	//ch := make(chan kafka.Message)
-	//var wg sync.WaitGroup
-	//
-	//wg.Add(1)
-	//go func() {
-	//	fmt.Println("Hree")
-	//	utils.ListenToUpcomingEvents(ch)
-	//	wg.Done()
-	//}()
-	//
-	//wg.Add(1)
-	//go func() {
-	//	utils.ProcessEvents(ch)
-	//	wg.Done()
-	//}()
-	//
-	//wg.Wait()
-
+func ListenToUpcomingEvents(ch chan kafka.Message) {
 	conf := kafka.ReaderConfig{
 		Brokers: []string{"localhost:9092"},
 		Topic:   "github-events",
@@ -40,5 +22,6 @@ func main() {
 		}
 
 		fmt.Println("Received Message:", string(msg.Value))
+		ch <- msg
 	}
 }
