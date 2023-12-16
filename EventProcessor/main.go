@@ -7,10 +7,27 @@ import (
 )
 
 func main() {
+	//ch := make(chan kafka.Message)
+	//var wg sync.WaitGroup
+	//
+	//wg.Add(1)
+	//go func() {
+	//	fmt.Println("Hree")
+	//	utils.ListenToUpcomingEvents(ch)
+	//	wg.Done()
+	//}()
+	//
+	//wg.Add(1)
+	//go func() {
+	//	utils.ProcessEvents(ch)
+	//	wg.Done()
+	//}()
+	//
+	//wg.Wait()
+
 	conf := kafka.ReaderConfig{
 		Brokers: []string{"localhost:9092"},
 		Topic:   "github-events",
-		GroupID: "g1",
 	}
 
 	reader := kafka.NewReader(conf)
@@ -22,6 +39,6 @@ func main() {
 			continue
 		}
 
-		fmt.Println("Message is:", string(msg.Value))
+		fmt.Println("Received Message:", string(msg.Value))
 	}
 }

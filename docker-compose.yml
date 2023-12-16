@@ -39,3 +39,13 @@ services:
       echo -e 'Successfully created the following topics:'
       kafka-topics --bootstrap-server kafka:29092 --list
       "
+
+  postgres:
+    image: "postgres:11.22-bullseye"
+    environment:
+      - POSTGRES_PASSWORD=secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
