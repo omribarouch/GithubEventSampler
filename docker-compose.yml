@@ -42,6 +42,8 @@ services:
 
   postgres:
     image: "postgres:11.22-bullseye"
+    ports:
+      - '5432:5432'
     environment:
       - POSTGRES_PASSWORD=secret
     volumes:

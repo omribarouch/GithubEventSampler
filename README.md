@@ -1,1 +1,1 @@
-# GithubEventSampler
+# GithubEventHandler

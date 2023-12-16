@@ -1,5 +1,11 @@
 package models
 
+import "gorm.io/gorm"
+
 type GithubEvent struct {
-	ID uint `gorm:"primaryKey;autoIncrement"`
+	gorm.Model
+}
+
+func (GithubEvent) TableName() string {
+	return "GithubEvent"
 }
