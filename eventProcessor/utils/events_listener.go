@@ -10,6 +10,7 @@ func ListenToUpcomingEvents(ch chan kafka.Message) {
 	conf := kafka.ReaderConfig{
 		Brokers: []string{"localhost:9092"},
 		Topic:   "github-events",
+		GroupID: "g1",
 	}
 
 	reader := kafka.NewReader(conf)
