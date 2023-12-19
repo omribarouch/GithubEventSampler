@@ -7,7 +7,7 @@ import (
 )
 
 func GetEvents(c *fiber.Ctx) error {
-	events := []models.GithubEvent{}
+	events := []models.Event{}
 	database.DB.Db.Find(&events)
 
 	return c.Status(200).JSON(events)

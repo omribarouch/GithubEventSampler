@@ -40,9 +40,9 @@ func ConnectDB() {
 
 	log.Println("running migrations")
 	err = db.AutoMigrate(
-		&models2.GithubEvent{},
-		&models2.GithubActor{},
-		&models2.GithubRepository{},
+		&models2.Event{},
+		&models2.Actor{},
+		&models2.Repository{},
 	)
 	if err != nil {
 		fmt.Println("Failed to perform database auto migration:", err)

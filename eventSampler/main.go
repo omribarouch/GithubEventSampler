@@ -6,6 +6,7 @@ import (
 	"github.com/segmentio/kafka-go"
 	"io"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -35,7 +36,7 @@ func FetchGithubEvents() []byte {
 	if err != nil {
 		fmt.Println("Error creating request:", err)
 	}
-	req.Header.Set("Authorization", "Bearer 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")
+	req.Header.Set("Authorization", "Bearer "+os.Getenv("GITHUB_TOKEN"))
 	req.Header.Set("Accept", "application/vnd.github+json")
 
 	client := &http.Client{}
