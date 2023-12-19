@@ -1,11 +1,10 @@
 package models
 
-import "gorm.io/gorm"
-
 type GithubRepository struct {
-	gorm.Model
-	Name string `json:"name" gorm:"text;not null;default:null"`
-	Url  string `json:"url" gorm:"url;not null;default:null"`
+	ID     uint          `json:"id" gorm:"column:ID;primaryKey"`
+	Name   string        `json:"name" gorm:"column:Name;text;not null"`
+	Url    string        `json:"url" gorm:"column:Url;url;not null"`
+	Events []GithubEvent `gorm:"foreignKey:RepositoryID"`
 }
 
 func (GithubRepository) TableName() string {

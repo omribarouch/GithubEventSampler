@@ -1,11 +1,10 @@
 package models
 
-import "gorm.io/gorm"
-
 type GithubActor struct {
-	gorm.Model
-	Name      string `json:"name" gorm:"text;not null;default:null"`
-	AvatarUrl string `json:"avatarUrl" gorm:"text;not null;default:null"`
+	ID        uint          `json:"id" gorm:"column:ID;primaryKey"`
+	Name      string        `json:"name" gorm:"column:Name;text;not null;default:null"`
+	AvatarUrl string        `json:"avatarUrl" gorm:"column:AvatarUrl;text;not null;default:null"`
+	Events    []GithubEvent `gorm:"foreignKey:ActorID"`
 }
 
 func (GithubActor) TableName() string {
