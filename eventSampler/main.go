@@ -26,7 +26,6 @@ func main() {
 			fmt.Println("Error occurred while writing events to kafka:", err)
 		}
 
-		fmt.Println("Now sleeping...")
 		time.Sleep(5 * time.Second)
 	}
 }

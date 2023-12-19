@@ -14,7 +14,6 @@ func ListenToUpcomingEvents(ch chan kafka.Message) {
 	}
 
 	reader := kafka.NewReader(conf)
-	fmt.Println("Started listening...")
 	for {
 		msg, err := reader.ReadMessage(context.Background())
 		if err != nil {
@@ -22,7 +21,6 @@ func ListenToUpcomingEvents(ch chan kafka.Message) {
 			continue
 		}
 
-		fmt.Println("Received Message:", string(msg.Value))
 		ch <- msg
 	}
 }

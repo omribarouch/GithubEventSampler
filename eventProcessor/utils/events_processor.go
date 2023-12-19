@@ -23,8 +23,11 @@ func ProcessEvents(ch chan kafka.Message) {
 			if err != nil {
 				fmt.Println("Error processing message from kafka:", err)
 			}
-
+			tx := database.DB.Db.Begin()
 			database.DB.Db.Create(&newEvent)
+			newEvent.Repository.LastInvolvementTimestamp = time.Now()
+			newEvent.Actor.LastInvolvementTimestamp = time.Now()
+			tx.Commit()
 			fmt.Println("Successfully processed new event:", rawEvent)
 		}
 	}
