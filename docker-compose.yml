@@ -49,5 +49,49 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  apiServer:
+    image: omribar/github-event-handler:1.0.0
+    depends_on:
+      - postgres
+    ports:
+      - '3000:3000'
+    command:
+      - /bin/sh
+      - -c
+      - go run apiServer/main.go
+    environment:
+      - DB_HOST=postgres
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=secret
+
+  eventProcessor:
+    image: omribar/github-event-handler:1.0.0
+    depends_on:
+      - kafka
+      - postgres
+    command:
+      - /bin/sh
+      - -c
+      - go run eventProcessor/main.go
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - DB_HOST=postgres
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=secret
+
+  eventSampler:
+    image: omribar/github-event-handler:1.0.0
+    depends_on:
+      - kafka
+    command:
+      - /bin/sh
+      - -c
+      - go run eventSampler/main.go
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - GITHUB_TOKEN=<github api token>
+
 volumes:
   postgres_data:
