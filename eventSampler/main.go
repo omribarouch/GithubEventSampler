@@ -12,7 +12,7 @@ import (
 
 func main() {
 	kafkaWriter := kafka.Writer{
-		Addr:  kafka.TCP("localhost:9092"),
+		Addr:  kafka.TCP(os.Getenv("KAFKA_BROKER")),
 		Topic: "github-events",
 	}
 
