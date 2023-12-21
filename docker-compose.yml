@@ -52,7 +52,8 @@ services:
   apiServer:
     image: omribar/github-event-handler:1.0.0
     depends_on:
-      - postgres
+      postgres:
+        condition: service_started
     ports:
       - '3000:3000'
     command:
@@ -68,8 +69,10 @@ services:
   eventProcessor:
     image: omribar/github-event-handler:1.0.0
     depends_on:
-      - kafka
-      - postgres
+      init-kafka:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_started
     command:
       - /bin/sh
       - -c
@@ -84,14 +87,15 @@ services:
   eventSampler:
     image: omribar/github-event-handler:1.0.0
     depends_on:
-      - kafka
+      init-kafka:
+        condition: service_completed_successfully
     command:
       - /bin/sh
       - -c
       - go run eventSampler/main.go
     environment:
       - KAFKA_BROKER=kafka:29092
-      - GITHUB_TOKEN=<github api token>
+      - GITHUB_TOKEN=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
 
 volumes:
   postgres_data:
