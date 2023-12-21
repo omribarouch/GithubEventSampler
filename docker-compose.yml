@@ -1,43 +1,88 @@
 version: '2.1'
 services:
-  zookeeper:
+  zookeeper-1:
     image: confluentinc/cp-zookeeper:6.1.1
     ports:
-      - "2181:2181"
+      - "22181:2181"
     environment:
+      ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
 
-  kafka:
+  zookeeper-2:
+    image: confluentinc/cp-zookeeper:6.1.1
+    ports:
+      - "32181:2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka-1:
     image: confluentinc/cp-kafka:6.1.1
     depends_on:
-      - zookeeper
+      - zookeeper-1
+      - zookeeper-2
     ports:
-      - '9092:9092'
-    expose:
-      - '29092'
+      - '19092:9092'
     environment:
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper-1:2181,zookeeper-2:2181'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092,PLAINTEXT_HOST://localhost:19092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: '1'
+      KAFKA_MIN_INSYNC_REPLICAS: '1'
+
+  kafka-2:
+    image: confluentinc/cp-kafka:6.1.1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+    ports:
+      - '19093:9092'
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper-1:2181,zookeeper-2:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:9093,PLAINTEXT_HOST://localhost:19093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: '1'
+      KAFKA_MIN_INSYNC_REPLICAS: '1'
+
+  kafka-3:
+    image: confluentinc/cp-kafka:6.1.1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+    ports:
+      - '19094:9092'
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper-1:2181,zookeeper-2:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-3:9094,PLAINTEXT_HOST://localhost:19094
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: '1'
       KAFKA_MIN_INSYNC_REPLICAS: '1'
 
   init-kafka:
     image: confluentinc/cp-kafka:6.1.1
     depends_on:
-      - kafka
+      - kafka-1
+      - kafka-2
+      - kafka-3
     entrypoint: [ '/bin/sh', '-c' ]
     command: |
       "
       # blocks until kafka is reachable
-      kafka-topics --bootstrap-server kafka:29092 --list
+      kafka-topics --bootstrap-server kafka-1:9092,kafka-2:9093,kafka-3:9094 --list
 
       echo -e 'Creating kafka topics'
-      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic github-events --replication-factor 1 --partitions 1
+      kafka-topics --bootstrap-server kafka-1:9092,kafka-2:9093,kafka-3:9094 --create --if-not-exists --topic github-events --replication-factor 1 --partitions 1
 
       echo -e 'Successfully created the following topics:'
-      kafka-topics --bootstrap-server kafka:29092 --list
+      kafka-topics --bootstrap-server kafka-1:9092,kafka-2:9093,kafka-3:9094 --list
       "
 
   postgres:
@@ -78,7 +123,7 @@ services:
       - -c
       - go run eventProcessor/main.go
     environment:
-      - KAFKA_BROKER=kafka:29092
+      - KAFKA_BROKER=kafka-1:9092,kafka-2:9093,kafka-3:9094
       - DB_HOST=postgres
       - DB_NAME=postgres
       - DB_USER=postgres
@@ -94,7 +139,7 @@ services:
       - -c
       - go run eventSampler/main.go
     environment:
-      - KAFKA_BROKER=kafka:29092
+      - KAFKA_BROKER=kafka-1:9092
       - GITHUB_TOKEN=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
 
 volumes:
