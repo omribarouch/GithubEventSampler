@@ -3,9 +3,12 @@ package utils
 import (
 	"GithubEventHandler/database"
 	"GithubEventHandler/database/models"
+	"GithubEventHandler/utils"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/segmentio/kafka-go"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -24,12 +27,33 @@ func ProcessEvents(ch chan kafka.Message) {
 				fmt.Println("Error processing message from kafka:", err)
 			}
 			tx := database.DB.Db.Begin()
+			EnrichEventData(newEvent)
 			database.DB.Db.Create(&newEvent)
 			newEvent.Repository.LastInvolvementTimestamp = time.Now()
 			newEvent.Actor.LastInvolvementTimestamp = time.Now()
 			tx.Commit()
 			fmt.Println("Successfully processed new event:", rawEvent)
 		}
+	}
+}
+
+func EnrichEventData(event *models.Event) {
+	var repo models.Repository
+
+	err := database.DB.Db.First(&repo, event.RepositoryID).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		res := utils.SendGithubRequest("GET",
+			event.Repository.URL)
+
+		var enrichedRepositoryData map[string]interface{}
+
+		err := json.Unmarshal(res, &enrichedRepositoryData)
+		if err != nil {
+			fmt.Println("Error parsing the message from kafka:", err)
+		}
+
+		event.Repository.Stars = enrichedRepositoryData["stargazers_count"].(float64)
 	}
 }
 
